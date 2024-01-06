@@ -8,6 +8,8 @@ function App() {
   const [bpm, setBpm] = useState(120); // Initial BPM
   const [iterations, setIterations] = useState(0);
   const [stopSorting, setStopSorting] = useState(null);
+  const [activeNote, setActiveNote] = useState(null);
+
 
   const isSorted = (array) => {
     for (let i = 0; i < array.length - 1; i++) {
@@ -25,7 +27,7 @@ function App() {
   const handlePlayStop = () => {
     setIsSorting(!isSorting);
     if (!isSorting && !isSorted(bars)) {  // Check if the array is not already sorted
-      const stopFunc = bubbleSort(bars, setBars, setIsSorting, bpm, setIterations);
+      const stopFunc = bubbleSort(bars, setBars, setIsSorting, bpm, setIterations, setActiveNote);
       setStopSorting(() => stopFunc); // Store the stop function
     } else if (isSorting && stopSorting) {
       stopSorting(); // Use the stop function to clear timeout
@@ -83,11 +85,12 @@ function App() {
             height: `${value * 4}px`, 
             width: '20px', 
             margin: '0 2px', 
-            backgroundColor: 'blue', 
+            backgroundColor: index === activeNote ? 'orange' : 'blue', // Highlight active note
             display: 'inline-block' 
           }} />
         ))}
       </div>
+
     </div>
   );
 }
