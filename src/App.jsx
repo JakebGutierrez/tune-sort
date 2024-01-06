@@ -1,34 +1,69 @@
 import React, { useState } from 'react';
 import './App.css'
+import { bubbleSort } from './algorithms';
+
 
 function App() {
   const [isSorting, setIsSorting] = useState(false);
   const [bpm, setBpm] = useState(120); // Initial BPM
   const [iterations, setIterations] = useState(0);
+  const [stopSorting, setStopSorting] = useState(null);
+
+  const isSorted = (array) => {
+    for (let i = 0; i < array.length - 1; i++) {
+      if (array[i] > array[i + 1]) {
+        return false;
+      }
+    }
+    return true;
+  };
+  
+
+  
 
   // Function to handle Play/Stop button click
   const handlePlayStop = () => {
     setIsSorting(!isSorting);
-    // Reset iterations when starting
-    if (!isSorting) setIterations(0);
+    if (!isSorting && !isSorted(bars)) {  // Check if the array is not already sorted
+      const stopFunc = bubbleSort(bars, setBars, setIsSorting, bpm, setIterations);
+      setStopSorting(() => stopFunc); // Store the stop function
+    } else if (isSorting && stopSorting) {
+      stopSorting(); // Use the stop function to clear timeout
+    }
   };
+  
+ 
+
+  
 
   // Function to handle BPM change
   const handleBpmChange = (e) => {
     setBpm(e.target.value);
   };
 
-  // Define the scale (you can adjust the values to match the pitch)
+  // Utility function to shuffle an array
+  const shuffleArray = (array) => {
+    return array.sort(() => Math.random() - 0.5);
+  };
+
+  // Define the scale and shuffle it for initial state
   const scale = Array.from({ length: 25 }, (_, i) => i + 1);
+  const shuffledScale = shuffleArray([...scale]);
 
   // State to hold the bars
-  const [bars, setBars] = useState([...scale]);
+  const [bars, setBars] = useState(shuffledScale);
+
 
   // Shuffle function
   const handleShuffle = () => {
-    const shuffled = [...bars].sort(() => Math.random() - 0.5);
+    if (stopSorting) stopSorting(); // Clear sorting timeout on shuffle
+    const shuffled = shuffleArray([...scale]);
     setBars(shuffled);
+    setIsSorting(false);
+    setIterations(0);
   };
+  
+  
     
 
   return (
