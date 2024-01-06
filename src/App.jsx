@@ -18,9 +18,22 @@ function App() {
     setBpm(e.target.value);
   };
 
+  // Define the scale (you can adjust the values to match the pitch)
+  const scale = Array.from({ length: 25 }, (_, i) => i + 1);
+
+  // State to hold the bars
+  const [bars, setBars] = useState([...scale]);
+
+  // Shuffle function
+  const handleShuffle = () => {
+    const shuffled = [...bars].sort(() => Math.random() - 0.5);
+    setBars(shuffled);
+  };
+    
+
   return (
     <div className="App">
-      <h1>Sorting Visualizer with Music</h1>
+      <h1>Tune Sort</h1>
       <button onClick={handlePlayStop}>
         {isSorting ? 'Stop' : 'Play'}
       </button>
@@ -28,7 +41,18 @@ function App() {
         BPM: <input type="range" min="60" max="240" value={bpm} onChange={handleBpmChange} />
       </div>
       <div>Iterations: {iterations}</div>
-      {/* Visualization area will go here */}
+      <button onClick={handleShuffle}>Shuffle</button>
+      <div className="visualization-container">
+        {bars.map((value, index) => (
+          <div key={index} style={{ 
+            height: `${value * 4}px`, 
+            width: '20px', 
+            margin: '0 2px', 
+            backgroundColor: 'blue', 
+            display: 'inline-block' 
+          }} />
+        ))}
+      </div>
     </div>
   );
 }
