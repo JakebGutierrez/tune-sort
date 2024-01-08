@@ -1,34 +1,39 @@
 export const bubbleSort = (bars, updateBars, setIsSorting, bpm, setIterations, setActiveNote) => {
   let n = bars.length;
-  let isSorted = false;
+  let sortingRange = n;
   let timeoutId;
 
-  const sortOnce = (i = 0) => {
-    if (i < n - 1) {
-      setActiveNote(i); // Update the active note
+  const iterate = (i, end) => {
+    if (i < end - 1) {
+      setActiveNote(i); // Highlight the current note
 
       if (bars[i] > bars[i + 1]) {
         [bars[i], bars[i + 1]] = [bars[i + 1], bars[i]];
         updateBars([...bars]);
       }
 
-      // Delay for the next comparison
-      timeoutId = setTimeout(() => sortOnce(i + 1), 60000 / bpm);
+      timeoutId = setTimeout(() => iterate(i + 1, end), 60000 / bpm);
     } else {
-      // Proceed to next iteration or finish sorting
+      setActiveNote(i); // Ensure the last note is highlighted
       setIterations(prev => prev + 1);
 
-      if (isSorted) {
-        setIsSorting(false); // Sorting is completed
-        setActiveNote(null); // Reset active note
-      } else {
-        isSorted = true;
-        timeoutId = setTimeout(() => sortOnce(0), 60000 / bpm);
-      }
+      setTimeout(() => {
+        setActiveNote(null); // Reset the active note
+
+        if (end === sortingRange) {
+          sortingRange--; // Reduce the sorting range for the next pass
+        }
+
+        if (sortingRange > 1) {
+          iterate(0, sortingRange); // Continue sorting with the reduced range
+        } else {
+          setIsSorting(false); // Sorting is completed
+        }
+      }, 60000 / bpm);
     }
   };
 
-  sortOnce();
+  iterate(0, sortingRange);
 
   // Return a function to clear the timeout
   return () => {
